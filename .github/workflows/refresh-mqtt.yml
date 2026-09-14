@@ -1,0 +1,85 @@
+name: Refresh MQTT Retain
+
+on:
+  schedule:
+    # 6時間ごと
+    - cron: "0 */6 * * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-mqtt:
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    steps:
+      # ======================================================
+      # リポジトリ取得
+      # ======================================================
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ======================================================
+      # Python
+      # ======================================================
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # ======================================================
+      # 依存ライブラリ
+      # ======================================================
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ======================================================
+      # MQTT更新
+      # ======================================================
+      - name: Refresh MQTT Retain
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+          # 必要ならMQTT認証情報
+          MQTT_USERNAME: ${{ secrets.MQTT_USERNAME }}
+          MQTT_PASSWORD: ${{ secrets.MQTT_PASSWORD }}
+
+        run: |
+          python refresh_mqtt.py
+
+      # ======================================================
+      # GitHubバックアップを保存
+      # ======================================================
+      - name: Check changes
+        id: changes
+        run: |
+          git status --short
+
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ======================================================
+      # GitHubへバックアップ
+      # ======================================================
+      - name: Commit MQTT backup
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add mqtt_backup
+
+          git commit -m "chore: refresh MQTT audio backup"
+
+          git push
