@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-09-16T10:37:10.175269+00:00",
+  "updated_at": "2026-09-16T15:54:36.850375+00:00",
   "files": {
     "1ff358dc-e285-4902-9304-50ecad0baee2": {
       "id": "1ff358dc-e285-4902-9304-50ecad0baee2",
@@ -14,7 +14,7 @@
       "compression": "gzip",
       "mqtt_prefix": "chanpro/audio/v1/1ff358dc-e285-4902-9304-50ecad0baee2",
       "backup_complete": true,
-      "last_refresh": "2026-09-16T10:37:10.167676+00:00",
+      "last_refresh": "2026-09-16T15:54:36.842863+00:00",
       "missing_chunks": [],
       "sha256_chunks": {
         "0": "8d52f2a4c694d2a1ed48bfb909168adac601806237cdf6c0f7425ae833e47d39",
